@@ -1,1 +1,2 @@
-to be used commercially with credit to this page and with permission
+For Commercial Use please inquire:
+https://discord.gg/ uk99G4pxNA
