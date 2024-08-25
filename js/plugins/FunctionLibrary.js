@@ -127,6 +127,13 @@
                     console.error(`Unknown library type: ${libraryType}`);
             }
         }
+
+        reserveState(contextVarId, globalFlagsVarId, playerFlagsVarId, eventFlagsVarId) {
+            $gameVariables.setValue(contextVarId, this.librariesLoaded ? 1 : 0);
+            $gameVariables.setValue(globalFlagsVarId, window.GlobalFlagLibrary.saveFlags());
+            $gameVariables.setValue(playerFlagsVarId, window.PlayerFlagLibrary.saveFlags());
+            $gameVariables.setValue(eventFlagsVarId, window.EventFlagLibrary.saveFlags());
+        }
     }
 
     // Create a global instance of FunctionLibraryManager
@@ -144,6 +151,9 @@
         } else if (command === 'Run') {
             const [libraryType, ...restArgs] = args;
             window.functionLibraryManager.run(libraryType, ...restArgs);
+        } else if (command === 'ReserveFlags') {
+            const [contextVarId, globalFlagsVarId, playerFlagsVarId, eventFlagsVarId] = args.map(Number);
+            window.functionLibraryManager.reserveState(contextVarId, globalFlagsVarId, playerFlagsVarId, eventFlagsVarId);
         }
     };
 })();
@@ -186,12 +196,10 @@ class FlagLibrary {
         return null;
     }
 
-
     setFlag(category, flagName, value) {
         if (!this.flags[category]) {
             this.flags[category] = {};
         }
-        // console.log(`Flag Set From: ${category}.${flagName} = ${this.flags[category][flagName]}`);
         this.flags[category][flagName] = value;
         console.log(`Flag Set To: ${category}.${flagName} = ${value}`);
     }
