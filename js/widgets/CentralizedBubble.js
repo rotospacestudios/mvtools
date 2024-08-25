@@ -1,40 +1,38 @@
 /*:
- * @plugindesc Displays a speech bubble above an event in RPG Maker MV.
+ * @plugindesc Displays a centralized speech bubble in RPG Maker MV.
  * @help
  * ============================================================================
  * Introduction
  * ============================================================================
- * This plugin provides a SpeechBubble class that displays a speech bubble
- * above a specified event. The speech bubble can show text and follow the
- * event as it moves.
+ * This plugin provides a CentralizedBubble class that displays a speech bubble
+ * in the center of the screen. The speech bubble can show text and will be
+ * displayed for a specified duration.
  *
  * ============================================================================
  * Parameters
  * ============================================================================
  * id - A unique identifier for the speech bubble instance.
  * text - The text to display inside the speech bubble.
- * eventName - The name of the event to follow.
  * maxShowTime - The maximum time (in milliseconds) to display the speech bubble.
  *
  * ============================================================================
  * Example Usage
  * ============================================================================
- * const speechBubble = new SpeechBubble(1, "Hello, World!", "EventName", 5000);
- * speechBubble.show();
+ * const centralizedBubble = new CentralizedBubble(1, "Hello, World!", 5000);
+ * centralizedBubble.show();
  *
  * ============================================================================
  * Terms of Use
  * ============================================================================
  * Free for use in both commercial and non-commercial projects.
- * Credit are required - Akko Sinn.
+ * Credit is required - Akko Sinn.
  */
 
-class SpeechBubble extends DefaultWidget {
-    constructor(id, text, eventName, maxShowTime) {
+class CentralizedBubble extends DefaultWidget {
+    constructor(id, text, maxShowTime) {
         super();
         this.id = id; // Assign a unique ID to each instance
         this.text = text;
-        this.eventName = eventName;
         this.maxShowTime = maxShowTime || 5000; // Default to 5000ms if not provided
         this.fadeInApplied = false; // Flag to track if fade-in has been applied
 
@@ -64,9 +62,6 @@ class SpeechBubble extends DefaultWidget {
                 this.hide();
             }, this.maxShowTime);
         }
-
-        // Start updating the position to follow the event
-        this.startUpdatingPosition();
     }
 
     createTextWindow(w, h) {
@@ -123,52 +118,11 @@ class SpeechBubble extends DefaultWidget {
         this.fadeInApplied = true; // Mark fade-in as applied
     }
 
-    findEventByName(name) {
-        return $gameMap.events().find(event => event.event().name === name);
-    }
-
-    startUpdatingPosition() {
-        this.updateInterval = setInterval(() => {
-            this.updatePosition();
-            this.updateEventDirection();
-        }, 1000 / 60); // Update position and direction at 60 FPS
-    }
-
-    stopUpdatingPosition() {
-        clearInterval(this.updateInterval);
-    }
-
     updatePosition() {
-        const event = this.findEventByName(this.eventName);
-        if (event) {
-            const eventScreenX = event.screenX();
-            const eventScreenY = event.screenY();
-            this.window.x = eventScreenX - this.window.width / 2;
-            this.window.y = eventScreenY - this.window.height - 30; // Adjust the offset as needed
-        }
-    }
-
-    updateEventDirection() {
-        const event = this.findEventByName(this.eventName);
-        if (event) {
-            const player = $gamePlayer;
-            const dx = player.x - event.x;
-            const dy = player.y - event.y;
-
-            if (Math.abs(dx) > Math.abs(dy)) {
-                if (dx > 0) {
-                    event.setDirection(6); // Face right
-                } else {
-                    event.setDirection(4); // Face left
-                }
-            } else {
-                if (dy > 0) {
-                    event.setDirection(2); // Face down
-                } else {
-                    event.setDirection(8); // Face up
-                }
-            }
-        }
+        const screenWidth = Graphics.boxWidth;
+        const screenHeight = Graphics.boxHeight;
+        this.window.x = (screenWidth - this.window.width) / 2;
+        this.window.y = (screenHeight - this.window.height) / 2;
     }
 
     show() {
@@ -178,7 +132,6 @@ class SpeechBubble extends DefaultWidget {
 
     hide() {
         this.window.hide();
-        this.stopUpdatingPosition();
         clearTimeout(this.hideTimeout);
         clearInterval(this.fadeBoxInterval);
         clearInterval(this.fadeTextInterval);
@@ -191,13 +144,12 @@ class SpeechBubble extends DefaultWidget {
 
         // Notify WidgetManager to remove this instance
         if (window.widgetManager) {
-            window.widgetManager.removeWidgetInstance('SpeechBubble', this.id);
+            window.widgetManager.removeWidgetInstance('CentralizedBubble', this.id);
         }
     }
 }
 
 // Expose the widget class globally
-window.SpeechBubble = SpeechBubble;
+window.CentralizedBubble = CentralizedBubble;
 
-
-widgetManager.registerWidgetConstructor('SpeechBubble', SpeechBubble);
+widgetManager.registerWidgetConstructor('CentralizedBubble', CentralizedBubble);
