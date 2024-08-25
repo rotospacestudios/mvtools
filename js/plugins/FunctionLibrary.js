@@ -191,7 +191,9 @@ class FlagLibrary {
         if (!this.flags[category]) {
             this.flags[category] = {};
         }
+        // console.log(`Flag Set From: ${category}.${flagName} = ${this.flags[category][flagName]}`);
         this.flags[category][flagName] = value;
+        console.log(`Flag Set To: ${category}.${flagName} = ${value}`);
     }
 
     saveFlags() {

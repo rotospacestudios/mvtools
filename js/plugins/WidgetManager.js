@@ -1,34 +1,31 @@
-/*:
- * @plugindesc Manages the creation, display, and removal of various widgets in RPG Maker MV.
- * @help
- * ============================================================================
- * Introduction
- * ============================================================================
- * This plugin provides a WidgetManager class that handles the registration,
- * loading, showing, and hiding of different widget types. It allows for
- * dynamic management of widgets within the game.
- *
- * ============================================================================
- * Plugin Commands
- * ============================================================================
- * ShowWidget <widgetName> <id> <params...>
- * - Shows a widget of the specified type with the given ID and parameters.
- *
- * HideWidget <widgetName> <id>
- * - Hides the widget of the specified type with the given ID.
- *
- * ============================================================================
- * Example Usage
- * ============================================================================
- * Plugin Command: ShowWidget SpeechBubble 1 "Hello, World!" "EventName" 5000
- * Plugin Command: HideWidget SpeechBubble 1
- *
- */
-
 class WidgetManager {
     constructor() {
         this.widgetConstructors = {};
         this.widgetInstances = {};
+
+        // Load DefaultWidget.js during initialization
+        this.loadDefaultWidgetScript(() => {
+            console.log('DefaultWidget loaded and registered.');
+        });
+    }
+
+    loadDefaultWidgetScript(callback) {
+        const script = document.createElement('script');
+        script.src = `js/widgets/DefaultWidget.js`;
+        script.onload = () => {
+            if (typeof window.DefaultWidget === 'function') {
+                this.registerWidgetConstructor('DefaultWidget', window.DefaultWidget);
+                callback();
+            } else {
+                console.error('DefaultWidget is not defined correctly.');
+            }
+        };
+
+        script.onerror = () => {
+            console.error('Failed to load DefaultWidget.');
+        };
+
+        document.body.appendChild(script);
     }
 
     registerWidgetConstructor(widgetName, widgetConstructor) {
@@ -41,6 +38,20 @@ class WidgetManager {
     loadWidgetScript(widgetName, callback) {
         if (this.widgetConstructors[widgetName]) {
             callback();
+            return;
+        }
+
+        // Check if the script is already loaded
+        const existingScript = document.querySelector(`script[src="js/widgets/${widgetName}.js"]`);
+        if (existingScript) {
+            existingScript.onload = () => {
+                if (typeof window[widgetName] === 'function') {
+                    this.registerWidgetConstructor(widgetName, window[widgetName]);
+                    callback();
+                } else {
+                    console.error(`Widget ${widgetName} is not defined correctly.`);
+                }
+            };
             return;
         }
 
@@ -97,6 +108,15 @@ class WidgetManager {
 
 // Create a global instance of WidgetManager
 window.widgetManager = new WidgetManager();
+
+// Register the CentralizedBubble widget constructor if not already registered
+if (typeof CentralizedBubble !== 'undefined') {
+    widgetManager.registerWidgetConstructor('CentralizedBubble', CentralizedBubble);
+}
+// Register the TextInputPrompt widget constructor if not already registered
+if (typeof TextInputPrompt !== 'undefined') {
+    widgetManager.registerWidgetConstructor('TextInputPrompt', TextInputPrompt);
+}
 
 // Plugin command to show or hide a widget
 const _Game_Interpreter_pluginCommand = Game_Interpreter.prototype.pluginCommand;
