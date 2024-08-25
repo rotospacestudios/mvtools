@@ -23,11 +23,6 @@
  * Plugin Command: ShowWidget SpeechBubble 1 "Hello, World!" "EventName" 5000
  * Plugin Command: HideWidget SpeechBubble 1
  *
- * ============================================================================
- * Terms of Use
- * ============================================================================
- * Free for use in both commercial and non-commercial projects.
- * Credit are required - Akko Sinn.
  */
 
 class WidgetManager {
