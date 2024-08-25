@@ -22,11 +22,6 @@
  * const speechBubble = new SpeechBubble(1, "Hello, World!", "EventName", 5000);
  * speechBubble.show();
  *
- * ============================================================================
- * Terms of Use
- * ============================================================================
- * Free for use in both commercial and non-commercial projects.
- * Credit are required - Akko Sinn.
  */
 
 {
